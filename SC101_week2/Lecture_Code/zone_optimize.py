@@ -21,32 +21,32 @@ def main():
         graphics.ball.move(graphics.dx, graphics.dy)
 
         # check
-        if graphics.dx > 0:
-            graphics.dx_right = True
-        else:
-            graphics.dx_right = False
-        if graphics.dy > 0:
-            graphics.dy_down = True
-        else:
-            graphics.dy_down = False
 
         if graphics.ball.x <= 0 or graphics.ball.x + graphics.ball.width >= graphics.window.width:
             graphics.dx*= -1
         if graphics.ball.y <= 0 or graphics.ball.y + graphics.ball.height >= graphics.window.height:
             graphics.dy*=-1
 
-        if graphics.window.get_object_at(graphics.ball.x, graphics.ball.y) and graphics.window.get_object_at(graphics.ball.x, graphics.ball.y + graphics.ball.height) and graphics.dx_right is False:
-            graphics.dx*=-1
-            graphics.dx_right = True
-        if graphics.window.get_object_at(graphics.ball.x + graphics.ball.width, graphics.ball.y) and graphics.window.get_object_at(graphics.ball.x + graphics.ball.width, graphics.ball.y + graphics.ball.height) and graphics.dx_right is True:
-            graphics.dx *= -1
-            graphics.dx_right = False
-        if graphics.window.get_object_at(graphics.ball.x, graphics.ball.y) and graphics.window.get_object_at(graphics.ball.x + graphics.ball.width, graphics.ball.y) and graphics.dy_down is False:
-            graphics.dy*=-1
-            graphics.dy_down = True
-        if graphics.window.get_object_at(graphics.ball.x, graphics.ball.y + graphics.ball.height) and graphics.window.get_object_at(graphics.ball.x + graphics.ball.width, graphics.ball.y + graphics.ball.height) and graphics.dy_down is True:
+        maybe_obj = graphics.window.get_object_at(graphics.ball.x, graphics.ball.y)
+        if maybe_obj:
+            if maybe_obj.x + maybe_obj.width > graphics.ball.x:
+                graphics.dy*=-1
+            elif maybe_obj.x + maybe_obj.width == graphics.ball.x and maybe_obj.y + maybe_obj.height == graphics.ball.y:
+                graphics.dx *= -1
+                graphics.dy *= -1
+            elif maybe_obj.y + maybe_obj.height >  graphics.ball.y:
+                graphics.dx *= -1
+
+        maybe_obj = graphics.window.get_object_at(graphics.ball.x, graphics.ball.y + graphics.ball.height)
+        if maybe_obj.x + maybe_obj.width > graphics.ball.x:
             graphics.dy *= -1
-            graphics.dy_down = False
+        elif maybe_obj.x + maybe_obj.width == graphics.ball.x and maybe_obj.y + maybe_obj.height == graphics.ball.y:
+            graphics.dx *= -1
+            graphics.dy *= -1
+        elif maybe_obj.y + maybe_obj.height > graphics.ball.y:
+            graphics.dx *= -1
+
+
 
         print("vx = ", graphics.dx, "vy = ", graphics.dy, "ball_x = ", graphics.ball.x, "ball_y = ", graphics.ball.y)
 

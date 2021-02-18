@@ -4,7 +4,11 @@ Adapted from Eric Roberts's Breakout by
 Sonja Johnson-Yu, Kylie Jue, Nick Bowman, 
 and Jerry Liao
 
-YOUR DESCRIPTION HERE
+Bricks Breakout Game!
+Three lives and let's see how good you are!
+
+author: sheng-hao wu
+description: class/object/method defined file
 """
 from campy.graphics.gwindow import GWindow
 from campy.graphics.gobjects import GOval, GRect, GLabel
@@ -21,9 +25,9 @@ BALL_RADIUS = 10       # Radius of the ball (in pixels).
 PADDLE_WIDTH = 75      # Width of the paddle (in pixels).
 PADDLE_HEIGHT = 15     # Height of the paddle (in pixels).
 PADDLE_OFFSET = 50     # Vertical offset of the paddle from the window bottom (in pixels).
-
 INITIAL_Y_SPEED = 7.0  # Initial vertical speed for the ball.
 MAX_X_SPEED = 5        # Maximum initial horizontal speed for the ball.
+MIN_X_SPEED = 1        # Minimum initial horizontal speed for the ball.
 
 
 class BreakoutGraphics:
@@ -45,14 +49,12 @@ class BreakoutGraphics:
         self.obj_fill_color_add(self.paddle, "black")
 
         # Center a filled ball in the graphical window.
-        # self.ball = GOval(ball_radius, ball_radius, x=(window_width - ball_radius) / 2, y=(window_height - ball_radius)/2)
-        self.ball = GOval(ball_radius, ball_radius, x=0,
-                          y=(window_height - ball_radius) / 2)
+        self.ball = GOval(ball_radius, ball_radius, x=(window_width - ball_radius) / 2, y=(window_height - ball_radius)/2)
 
         self.obj_fill_color_add(self.ball, "black")
 
-        # Default initial velocity for the ball.
-        self.__dx = random.randint(0, MAX_X_SPEED)
+        # Default initial velocity and direction control for the ball.
+        self.__dx = random.randint(MIN_X_SPEED, MAX_X_SPEED)
         if random.random() > 0.5:
             self.__dx = -self.__dx
 
@@ -64,11 +66,13 @@ class BreakoutGraphics:
         self.__dy = INITIAL_Y_SPEED
         self.__dy_down = True
 
+        # Game flow control related
         self.ball_active = False
         self.remained_life = 0
         self.remained_bricks = brick_cols * brick_rows
 
         # Initialize our mouse listeners.
+        #only when mouse clicked would active the game
         onmouseclicked(self.game_active)
         onmousemoved(self.move_paddle)
 
@@ -118,22 +122,23 @@ class BreakoutGraphics:
         self.__dy_down = val
         return self.__dy_down
 
-    # function for paddle track mouse.x position
+    # func for paddle track mouse.x position
     def move_paddle(self, mouse):
         if 0 + self.paddle.width/2 <= mouse.x <= self.window.width - self.paddle.width/2:
             self.paddle.x = mouse.x - self.paddle.width/2
 
+    # func to active game
     def game_active(self, mouse):
         self.ball_active = True
 
+    # reset ball's position
     def reset_ball_position(self):
         self.ball.x = (self.window.width - self.ball.width) / 2
         self.ball.y = (self.window.height - self.ball.height) / 2
 
+    # func helps fill and add object
     def obj_fill_color_add(self, obj, color):
         obj.color = color
         obj.filled = True
         obj.fill_color = color
         self.window.add(obj)
-
-
