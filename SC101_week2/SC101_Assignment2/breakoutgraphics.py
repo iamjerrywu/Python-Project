@@ -50,7 +50,6 @@ class BreakoutGraphics:
 
         # Center a filled ball in the graphical window.
         self.ball = GOval(ball_radius, ball_radius, x=(window_width - ball_radius) / 2, y=(window_height - ball_radius)/2)
-
         self.obj_fill_color_add(self.ball, "black")
 
         # Default initial velocity and direction control for the ball.
