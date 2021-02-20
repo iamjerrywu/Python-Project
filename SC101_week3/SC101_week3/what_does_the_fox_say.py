@@ -13,6 +13,14 @@ def main():
     Add some sound of animals!
     """
     sounds = {}
+    sounds['dog'] = 'woof'
+    sounds['cat'] = 'meow'
+    sounds['bird'] = 'tweet'
+    sounds['fox'] = 'grininindergeringer'
+    sounds['fox'] = 'wapappapapapapa'
+
+    print_dict(sounds)
+
 
 
 def print_dict(d):
@@ -21,7 +29,9 @@ def print_dict(d):
     ------------------------------------------------
     This function prints out all the key-value pairs in d
     """
-    pass
+    for key in d:
+        value = d[key]
+        print(key, "->", value)
 
 
 if __name__ == '__main__':

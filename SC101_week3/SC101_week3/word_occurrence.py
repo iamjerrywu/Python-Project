@@ -16,7 +16,17 @@ PUNCTUATION = '.,;!?#&-\'_+=/\\"@$^%()[]{}~'
 
 
 def main():
-	pass
+	word_d = {}
+	with open(FILE, "r") as f:
+		for line in f:
+			word_lst = line.split()
+			for word in word_lst:
+				new_word = string_manipulation(word)
+				if new_word in word_d:
+					word_d[new_word]+=1
+				else:
+					word_d[new_word] = 1
+	print_out_d(word_d)
 
 
 def print_out_d(d):
@@ -26,7 +36,17 @@ def print_out_d(d):
 	---------------------------------------------------------------
 	This method prints out all the info in d
 	"""
-	pass
+	for key in d:
+		print(key, "->", d[key])
+
+def string_manipulation(word):
+	ans = ""
+	for ch in word:
+		if ch not in PUNCTUATION:
+			ans+=ch
+	ans = ans.lower()
+	return ans
+
 
 
 if __name__ == '__main__':
