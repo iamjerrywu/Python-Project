@@ -209,7 +209,10 @@ def ball_collision_handler(obj):
             # remove object
             rm_obj_handler(rm_obj, obj)
 
-        #down-middle point:
+        """
+        Once the ball get bigger enough need to consider upper / lower middle point, to make it more real
+        """
+        # if ball is big enough
         if obj.ball.width > obj.paddle.width:
             # down-middle point:
             rm_obj = obj.window.get_object_at(obj.ball.x + obj.ball.width/2, obj.ball.y + obj.ball.height + 1)
@@ -308,10 +311,11 @@ def main():
             # move ball
             graphics.ball.move(graphics.get_ball_dx(), graphics.get_ball_dy())
 
-            # movecannon_appear cannon flame
+            # move cannon/flame
             if graphics.cannon_appear:
                 graphics.cannon_icon.move(graphics.cannon_icon_dx, graphics.cannon_icon_dy)
                 graphics.cannon_icon_background.move(graphics.cannon_icon_dx, graphics.cannon_icon_dy)
+            # move ball_size_inc icon
             if graphics.ball_size_inc_appear:
                 graphics.ball_size_inc_icon.move(graphics.cannon_icon_dx, graphics.cannon_icon_dy)
                 graphics.ball_size_inc_icon_background.move(graphics.cannon_icon_dx, graphics.cannon_icon_dy)
