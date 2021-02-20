@@ -6,6 +6,7 @@ and Jerry Liao
 
 Bricks Breakout Game!
 Three lives and let's see how good you are!
+Extension with larger balls, weaponize features
 
 author: sheng-hao wu
 description: animations-related file
@@ -13,25 +14,122 @@ description: animations-related file
 
 from campy.gui.events.timer import pause
 from breakoutgraphics import BreakoutGraphics
+import random
 
 FRAME_RATE = 1000 / 120 # 120 frames per second.
 
 # func for checking boundary
 def boundary_check(obj):
     # ensure ball's is within window and handles it's direction
-    if obj.ball.x <= 0 and obj.get_ball_dx_right() is False or obj.ball.x + obj.ball.width >= obj.window.width and obj.get_ball_dx_right() is True:
-        obj.set_ball_dx(-obj.get_ball_dx())
-        obj.set_ball_dx_right(not obj.get_ball_dx_right())
-    if obj.ball.y <= 0 and obj.get_ball_dy_down() is False:
-        obj.set_ball_dy(-obj.get_ball_dy())
-        obj.set_ball_dy_down(True)
-    # if ball's out of window's low bound, life count - 1 and pause the game
-    elif obj.ball.y >= obj.window.height:
-        obj.ball_active = False
-        obj.window.remove(obj.life_icons[obj.num_lives - obj.remained_life])
-        obj.remained_life-=1
+    if not obj.ball_destroy:
+        if obj.ball.x <= 0 and obj.get_ball_dx_right() is False or obj.ball.x + obj.ball.width >= obj.window.width and obj.get_ball_dx_right() is True:
+            obj.set_ball_dx(-obj.get_ball_dx())
+            obj.set_ball_dx_right(not obj.get_ball_dx_right())
+        if obj.ball.y <= 0 and obj.get_ball_dy_down() is False:
+            obj.set_ball_dy(-obj.get_ball_dy())
+            obj.set_ball_dy_down(True)
+        # if ball's out of window's low bound, life count - 1 and pause the game
+        elif obj.ball.y >= obj.window.height:
+            obj.ball_active = False
+            obj.window.remove(obj.life_icons[obj.num_lives - obj.remained_life])
+            obj.remained_life-=1
 
 def collisions_handler(obj):
+
+    # handle ball's collision
+    ball_collision_handler(obj)
+
+    # handle if cannon icon touch paddle
+    maybe_obj = obj.window.get_object_at(obj.cannon_icon_background.x, obj.cannon_icon_background.y + obj.cannon_icon_background.height + 1)
+    if maybe_obj and maybe_obj is obj.paddle:
+        obj.window.remove(obj.cannon_icon)
+        obj.window.remove(obj.cannon_icon_background)
+        create_cannon_flame(obj)
+
+    maybe_obj = obj.window.get_object_at(obj.cannon_icon_background.x + obj.cannon_icon_background.width, obj.cannon_icon_background.y + obj.cannon_icon_background.height + 1)
+    if maybe_obj and maybe_obj is obj.paddle:
+        obj.window.remove(obj.cannon_icon)
+        obj.window.remove(obj.cannon_icon_background)
+        create_cannon_flame(obj)
+
+    # handle if ball size inc icon touch paddle
+    maybe_obj = obj.window.get_object_at(obj.ball_size_inc_icon_background.x,
+                                         obj.ball_size_inc_icon_background.y + obj.ball_size_inc_icon_background.height + 1)
+    if maybe_obj and maybe_obj is obj.paddle:
+        obj.window.remove(obj.ball_size_inc_icon)
+        obj.window.remove(obj.ball_size_inc_icon_background)
+        obj.ball_size_inc_appear = False
+        obj.trigger_ball_size_inc_bricks_num = random.randint(obj.remained_bricks - obj.ball_inc_appearance_interval, obj.remained_bricks)
+        if not obj.ball_increase:
+            obj.ball_increase = True
+            obj.ball._height+=obj.ball_radius_increase
+            obj.ball._width+=obj.ball_radius_increase
+            obj.window.remove(obj.ball)
+            obj.obj_fill_color_add(obj.ball, "black")
+
+    maybe_obj = obj.window.get_object_at(obj.ball_size_inc_icon_background.x + obj.ball_size_inc_icon_background.width, obj.ball_size_inc_icon_background.y + obj.ball_size_inc_icon_background.height + 1)
+    if maybe_obj and maybe_obj is obj.paddle:
+        obj.window.remove(obj.ball_size_inc_icon)
+        obj.window.remove(obj.ball_size_inc_icon_background)
+        obj.ball_size_inc_appear = False
+        obj.trigger_ball_size_inc_bricks_num = random.randint(obj.remained_bricks - obj.ball_inc_appearance_interval, obj.remained_bricks)
+        if not obj.ball_increase:
+            obj.ball_increase = True
+            obj.ball._height += obj.ball_radius_increase
+            obj.ball._width += obj.ball_radius_increase
+            print("shit2")
+            obj.window.remove(obj.ball)
+
+
+    # handle flame collide with bricks
+    if obj.flame_appear:
+        not_rm_list = [obj.ball_size_inc_icon, obj.ball_size_inc_icon_background]
+        for i in range(obj.bricks_rows):
+            # outer flame
+            rm_obj = obj.window.get_object_at(obj.outer_flame.x - 1, obj.outer_flame.y + (i + 1) * (obj.bricks_spacing + obj.bricks_height) - obj.bricks_height/2)
+            if rm_obj and rm_obj not in not_rm_list:
+                rm_obj_handler(rm_obj, obj)
+            rm_obj = obj.window.get_object_at(obj.outer_flame.x + obj.outer_flame.width + 1, obj.outer_flame.y + (i + 1) * (obj.bricks_spacing + obj.bricks_height) - obj.bricks_height / 2)
+            if rm_obj and rm_obj not in not_rm_list:
+                rm_obj_handler(rm_obj, obj)
+
+
+# remove object
+def rm_obj_handler(rm_obj, obj):
+    # if ball touch these objs, don't remove that obj
+    not_rm_obj_list = [obj.paddle, obj.cannon_base, obj.cannon_tube]
+    # if ball touch these objs, remove ball itself
+    rm_ball_list = [obj.outer_flame, obj.inner_flame_1, obj.inner_flame_2]
+
+    if rm_obj in rm_ball_list:
+        obj.window.remove(obj.ball)
+        obj.ball_destroy = True
+    elif rm_obj not in not_rm_obj_list:
+        # create color-score map
+        color_score_map = {"midnightblue":50, "mediumblue":40, "blue":30, "dodgerblue":20, "lightskyblue":10}
+
+        # update score
+        obj.score+=color_score_map[rm_obj.color_str]
+        obj.score_label.text = "Score: " + str(obj.score)
+
+        # if hit brick with cannon icon property, create cannon icon
+        if not obj.cannon_appear and obj.remained_bricks <= obj.trigger_cannon_bricks_num:
+            create_cannon_icon(obj, rm_obj)
+        if not obj.ball_size_inc_appear and obj.remained_bricks <= obj.trigger_ball_size_inc_bricks_num:
+            create_ball_size_inc_icon(obj, rm_obj)
+        # create color-score map
+        color_score_map = {"midnightblue":50, "mediumblue":40, "blue":30, "dodgerblue":20, "lightskyblue":10}
+
+        # update score
+        obj.score+=color_score_map[rm_obj.color_str]
+        obj.score_label.text = "Score: " + str(obj.score)
+
+        # remove bricks
+        obj.window.remove(rm_obj)
+        obj.remained_bricks-=1
+
+
+def ball_collision_handler(obj):
     change_dx = False
     change_dy = False
 
@@ -42,83 +140,74 @@ def collisions_handler(obj):
                 i. calculate the ball's previous position before collide, prev_pos(x,y) = cur_pos(x +/- abs(dx), y+/- abs(dy))
             b. based on the relationship between ball's previous position and the collide object, then change ball's direction
     """
-    #upper-left point:
-    rm_obj = obj.window.get_object_at(obj.ball.x, obj.ball.y)
-    if rm_obj and rm_obj is not obj.ball and rm_obj is not obj.score_label and rm_obj is not obj.cannon_icon and rm_obj is not obj.life_icons[0] and rm_obj is not obj.life_icons[1] and rm_obj is not obj.life_icons[2]:
-        if obj.ball.x + abs(obj.get_ball_dx()) > rm_obj.x + rm_obj.width and obj.get_ball_dx_right() is False:
-            change_dx = True
-        if obj.ball.y + abs(obj.get_ball_dy()) >= rm_obj.y + rm_obj.height and obj.get_ball_dy_down() is False:
-            change_dy = True
-        # remove object
-        rm_obj_handler(rm_obj, obj)
+    no_collide_list = [obj.score_label, obj.cannon_icon_background, obj.cannon_icon, obj.life_icons[0],
+                       obj.life_icons[1], obj.life_icons[2], obj.ball_size_inc_icon_background, obj.ball_size_inc_icon]
+    # upper-left point:
+    if not obj.ball_destroy:
+        rm_obj = obj.window.get_object_at(obj.ball.x, obj.ball.y)
+        if rm_obj and rm_obj not in no_collide_list:
+            if obj.ball.x + abs(obj.get_ball_dx()) > rm_obj.x + rm_obj.width and obj.get_ball_dx_right() is False:
+                change_dx = True
+            if obj.ball.y + abs(obj.get_ball_dy()) >= rm_obj.y + rm_obj.height and obj.get_ball_dy_down() is False:
+                change_dy = True
+            # remove object
+            rm_obj_handler(rm_obj, obj)
 
-    # down-left point:
-    rm_obj = obj.window.get_object_at(obj.ball.x, obj.ball.y + obj.ball.height)
-    if rm_obj and rm_obj is not obj.ball and rm_obj is not obj.score_label and rm_obj is not obj.cannon_icon and rm_obj is not obj.life_icons[0] and rm_obj is not obj.life_icons[1] and rm_obj is not obj.life_icons[2]:
-        if obj.ball.x + abs(obj.get_ball_dx()) > rm_obj.x + rm_obj.width and obj.get_ball_dx_right() is False:
-            change_dx = True
-        if obj.ball.y + obj.ball.height - abs(obj.get_ball_dy()) < rm_obj.y and obj.get_ball_dy_down() is True:
-            change_dy = True
-        # remove object
-        rm_obj_handler(rm_obj, obj)
+        # down-left point:
+        rm_obj = obj.window.get_object_at(obj.ball.x, obj.ball.y + obj.ball.height)
+        if rm_obj and rm_obj not in no_collide_list:
+            if obj.ball.x + abs(obj.get_ball_dx()) > rm_obj.x + rm_obj.width and obj.get_ball_dx_right() is False:
+                change_dx = True
+            if obj.ball.y + obj.ball.height - abs(obj.get_ball_dy()) < rm_obj.y and obj.get_ball_dy_down() is True:
+                change_dy = True
+            # remove object
+            rm_obj_handler(rm_obj, obj)
 
-    # down-right point:
-    rm_obj = obj.window.get_object_at(obj.ball.x + obj.ball.width, obj.ball.y + obj.ball.height)
-    if rm_obj and rm_obj is not obj.ball and rm_obj is not obj.score_label and rm_obj is not obj.cannon_icon and rm_obj is not obj.life_icons[0] and rm_obj is not obj.life_icons[1] and rm_obj is not obj.life_icons[2]:
-        if obj.ball.x + obj.ball.width - abs(obj.get_ball_dx()) < rm_obj.x and obj.get_ball_dx_right() is True:
-            change_dx = True
-        if obj.ball.y + obj.ball.height - abs(obj.get_ball_dy()) < rm_obj.y and obj.get_ball_dy_down() is True:
-            change_dy = True
-        # remove object
-        rm_obj_handler(rm_obj, obj)
+        # down-right point:
+        rm_obj = obj.window.get_object_at(obj.ball.x + obj.ball.width, obj.ball.y + obj.ball.height)
+        if rm_obj and rm_obj not in no_collide_list:
+            if obj.ball.x + obj.ball.width - abs(obj.get_ball_dx()) < rm_obj.x and obj.get_ball_dx_right() is True:
+                change_dx = True
+            if obj.ball.y + obj.ball.height - abs(obj.get_ball_dy()) < rm_obj.y and obj.get_ball_dy_down() is True:
+                change_dy = True
+            # remove object
+            rm_obj_handler(rm_obj, obj)
 
-    # up-right point:
-    rm_obj = obj.window.get_object_at(obj.ball.x + obj.ball.width, obj.ball.y)
-    if rm_obj and rm_obj is not obj.ball and rm_obj is not obj.score_label and rm_obj is not obj.cannon_icon and rm_obj is not obj.life_icons[0] and rm_obj is not obj.life_icons[1] and rm_obj is not obj.life_icons[2]:
-        if obj.ball.x + obj.ball.width - abs(obj.get_ball_dx()) < rm_obj.x and obj.get_ball_dx_right() is True:
-            change_dx = True
-        if obj.ball.y + abs(obj.get_ball_dy()) >= rm_obj.y + rm_obj.height and obj.get_ball_dy_down() is False:
-            change_dy = True
-        # remove object
-        rm_obj_handler(rm_obj, obj)
+        # up-right point:
+        rm_obj = obj.window.get_object_at(obj.ball.x + obj.ball.width, obj.ball.y)
+        if rm_obj and rm_obj not in no_collide_list:
+            if obj.ball.x + obj.ball.width - abs(obj.get_ball_dx()) < rm_obj.x and obj.get_ball_dx_right() is True:
+                change_dx = True
+            if obj.ball.y + abs(obj.get_ball_dy()) >= rm_obj.y + rm_obj.height and obj.get_ball_dy_down() is False:
+                change_dy = True
+            # remove object
+            rm_obj_handler(rm_obj, obj)
 
-    # change ball's direction
-    dx = -obj.get_ball_dx() if change_dx is True else obj.get_ball_dx()
-    dy = -obj.get_ball_dy() if change_dy is True else obj.get_ball_dy()
-    if change_dx or change_dy:
-        change_dir_handler(obj, dx, dy)
-
-    # handle cannon icon collision
-    maybe_obj = obj.window.get_object_at(obj.cannon_icon_background.x, obj.cannon_icon_background.y + obj.cannon_icon_background.height + 1)
-    # print(maybe_obj)
-    if maybe_obj and maybe_obj is obj.paddle:
-        obj.window.remove(obj.cannon_icon)
-        create_cannon_flame(obj)
-    maybe_obj = obj.window.get_object_at(obj.cannon_icon_background.x + obj.cannon_icon_background.width, obj.cannon_icon_background.y + obj.cannon_icon_background.height + 1)
-    # print(maybe_obj)
-    if maybe_obj and maybe_obj is obj.paddle:
-        obj.window.remove(obj.cannon_icon)
-        obj.window.remove(obj.cannon_icon_background)
-        create_cannon_flame(obj)
-
-# remove object
-def rm_obj_handler(rm_obj, obj):
-    if rm_obj is not obj.paddle and rm_obj is not obj.score_label and rm_obj is not obj.cannon_base and rm_obj is not obj.cannon_tube and rm_obj is not obj.cannon_icon:
-        color_score_map = {"midnightblue":50, "mediumblue":40, "blue":30, "dodgerblue":20, "lightskyblue":10}
-        obj.score+=color_score_map[rm_obj.color_str]
-        obj.score_label.text = "Score: " + str(obj.score)
-        if rm_obj is obj.bricks[obj.cannon_brick_index]:
-            create_cannon_icon(obj, rm_obj)
-        obj.window.remove(rm_obj)
-        obj.remained_bricks-=1
+        # change ball's direction
+        dx = -obj.get_ball_dx() if change_dx is True else obj.get_ball_dx()
+        dy = -obj.get_ball_dy() if change_dy is True else obj.get_ball_dy()
+        if change_dx or change_dy:
+            change_dir_handler(obj, dx, dy)
 
 
+# func help create cannon icon
 def create_cannon_icon(obj, rm_obj):
     obj.cannon_appear = True
     obj.window.add(obj.cannon_icon_background, rm_obj.x + (rm_obj.width - obj.cannon_icon_background.width)/2, rm_obj.y + (rm_obj.height - obj.cannon_icon_background.height)/2)
     obj.window.add(obj.cannon_icon, obj.cannon_icon_background.x, obj.cannon_icon_background.y)
+
+
+def create_ball_size_inc_icon(obj, rm_obj):
+    obj.ball_size_inc_appear = True
+    obj.ball_increase = False
+    obj.window.add(obj.ball_size_inc_icon_background, rm_obj.x + (rm_obj.width - obj.ball_size_inc_icon_background.width) / 2, rm_obj.y + (rm_obj.height - obj.ball_size_inc_icon_background.height) / 2)
+    obj.window.add(obj.ball_size_inc_icon, obj.ball_size_inc_icon_background.x, obj.ball_size_inc_icon_background.y)
+
+
+# func help create cannon and flame
 def create_cannon_flame(obj):
-    obj.window.add(obj.cannon_base, obj.paddle.x + (obj.paddle.width - obj.cannon_base.width) / 2, obj.cannon_base.y)
+    obj.flame_appear = True
+    obj.window.add(obj.cannon_base, obj.paddle.x + (obj.paddle.width - obj.cannon_base.width)/2, obj.cannon_base.y)
     obj.window.add(obj.cannon_tube, obj.paddle.x + (obj.paddle.width - obj.cannon_tube.width) / 2, obj.cannon_tube.y)
     obj.window.add(obj.outer_flame, obj.paddle.x + (obj.paddle.width - obj.outer_flame.width)/2, obj.outer_flame.y)
     obj.window.add(obj.inner_flame_1, obj.paddle.x + (obj.paddle.width - obj.inner_flame_1.width)/2, obj.inner_flame_1.y)
@@ -138,6 +227,17 @@ def change_dir_handler(obj, dx, dy):
     else:
         obj.set_ball_dy_down(False)
 
+
+def game_over_handler(obj):
+    obj.window.add(obj.over_label, (obj.window.width - obj.over_label.width) / 2, obj.window.height / 2)
+    obj.window.remove(obj.paddle)
+    obj.window.remove(obj.cannon_base)
+    obj.window.remove(obj.cannon_tube)
+    obj.window.remove(obj.outer_flame)
+    obj.window.remove(obj.inner_flame_1)
+    obj.window.remove(obj.inner_flame_2)
+
+
 def main():
     graphics = BreakoutGraphics()
     # init remained life
@@ -147,10 +247,13 @@ def main():
             # move ball
             graphics.ball.move(graphics.get_ball_dx(), graphics.get_ball_dy())
 
-            # move cannon flame
+            # movecannon_appear cannon flame
             if graphics.cannon_appear:
                 graphics.cannon_icon.move(graphics.cannon_icon_dx, graphics.cannon_icon_dy)
                 graphics.cannon_icon_background.move(graphics.cannon_icon_dx, graphics.cannon_icon_dy)
+            if graphics.ball_size_inc_appear:
+                graphics.ball_size_inc_icon.move(graphics.cannon_icon_dx, graphics.cannon_icon_dy)
+                graphics.ball_size_inc_icon_background.move(graphics.cannon_icon_dx, graphics.cannon_icon_dy)
             # check for collision and handler ball's direction
             collisions_handler(graphics)
 
@@ -164,10 +267,10 @@ def main():
             # if no bricks remaining, gave over
             if graphics.remained_bricks == 0:
                 break
+            print(graphics.remained_bricks)
 
         pause(FRAME_RATE)
-    graphics.window.add(graphics.over_label, (graphics.window.width - graphics.over_label.width)/2, graphics.window.height/2)
-
+    game_over_handler(graphics)
 
 
 if __name__ == '__main__':

@@ -6,6 +6,7 @@ and Jerry Liao
 
 Bricks Breakout Game!
 Three lives and let's see how good you are!
+Extension with larger balls, weaponize features
 
 author: sheng-hao wu
 description: class/object/method defined file
@@ -16,29 +17,33 @@ from campy.graphics.gimage import GImage
 from campy.gui.events.mouse import onmouseclicked, onmousemoved
 import random
 
-BRICK_SPACING = 10      # Space between bricks (in pixels). This space is used for horizontal and vertical spacing.
-BRICK_WIDTH = 80        # Width of a brick (in pixels).
-BRICK_HEIGHT = 30       # Height of a brick (in pixels).
-BRICK_ROWS = 5          # Number of rows of bricks.
-BRICK_COLS = 10         # Number of columns of bricks.
-BRICK_OFFSET = 50       # Vertical offset of the topmost brick from the window top (in pixels).
-BALL_RADIUS = 10        # Radius of the ball (in pixels).
-PADDLE_WIDTH = 150      # Width of the paddle (in pixels).
-PADDLE_HEIGHT = 15      # Height of the paddle (in pixels).
-PADDLE_OFFSET = 50      # Vertical offset of the paddle from the window bottom (in pixels).
-INITIAL_Y_SPEED = 3.0   # Initial vertical speed for the ball.
-MAX_X_SPEED = 0         # Maximum initial horizontal speed for the ball.
-MIN_X_SPEED = 0         # Minimum initial horizontal speed for the ball.
-NUM_LIVES   = 3         # Number of lives
-CANNON_BASE_WIDTH = 30  # Width of cannon base
-CANNON_BASE_HEIGHT = 8  # Height of cannon base
-CANNON_TUBE_WIDTH = 10  # Width of cannon tube
-CANNON_TUBE_HEIGHT = 20 # Height of cannon tube
-OUTER_FLAME_WIDTH = 30   # Width of outer flame
-INNER_FLAME1_WIDTH = 20  # Width of inner flame
-INNER_FLAME2_WIDTH = 15  # Width of inner flame
-CANNON_ICON_Y_SPEED = 2  # Cannon icon y speed
-CANNON_ICON_X_SPEED = 0  # Cannon icon x speed
+BRICK_SPACING = 10         # Space between bricks (in pixels). This space is used for horizontal and vertical spacing.
+BRICK_WIDTH = 80           # Width of a brick (in pixels).
+BRICK_HEIGHT = 30          # Height of a brick (in pixels).
+BRICK_ROWS = 5             # Number of rows of bricks.
+BRICK_COLS = 10            # Number of columns of bricks.
+BRICK_OFFSET = 50          # Vertical offset of the topmost brick from the window top (in pixels).
+BALL_RADIUS = 10           # Radius of the ball (in pixels).
+PADDLE_WIDTH = 150         # Width of the paddle (in pixels).
+PADDLE_HEIGHT = 15         # Height of the paddle (in pixels).
+PADDLE_OFFSET = 50         # Vertical offset of the paddle from the window bottom (in pixels).
+INITIAL_Y_SPEED = 3.0      # Initial vertical speed for the ball.
+MAX_X_SPEED = 4            # Maximum initial horizontal speed for the ball.
+MIN_X_SPEED = 2            # Minimum initial horizontal speed for the ball.
+NUM_LIVES   = 3            # Number of lives
+CANNON_BASE_WIDTH = 30     # Width of cannon base
+CANNON_BASE_HEIGHT = 8     # Height of cannon base
+CANNON_TUBE_WIDTH = 10     # Width of cannon tube
+CANNON_TUBE_HEIGHT = 20    # Height of cannon tube
+MAX_CANNON_BRICKS = 40     # Maximum remained bricks to trigger cannon
+MIN_CANNON_BRICKS = 30     # Minimum remained bricks to trigger cannon
+OUTER_FLAME_WIDTH = 30     # Width of outer flame
+INNER_FLAME1_WIDTH = 20    # Width of inner flame
+INNER_FLAME2_WIDTH = 15    # Width of inner flame
+PROPERTY_ICON_Y_SPEED = 2  # Cannon icon y speed
+PROPERTY_ICON_X_SPEED = 0  # Cannon icon x speed
+BALL_RADIUS_INCREASE = 10  # Ball Increase Size
+BALL_INCREASE_INTERVAL = 2 # Ball increase appearance interval
 
 
 
@@ -61,9 +66,7 @@ class BreakoutGraphics:
         self.obj_fill_color_add(self.paddle, "black")
 
         # Center a filled ball in the graphical window.
-        # self.ball = GOval(ball_radius, ball_radius, x=(window_width - ball_radius) / 2, y=(window_height - ball_radius)/2)
-        self.ball = GOval(ball_radius, ball_radius, x=(window_width - ball_radius),
-                          y=(window_height - ball_radius) / 2)
+        self.ball = GOval(ball_radius, ball_radius, x=(window_width - ball_radius) / 2, y=(window_height - ball_radius)/2)
 
         self.obj_fill_color_add(self.ball, "black")
 
@@ -80,7 +83,6 @@ class BreakoutGraphics:
             self.life_icons[i] = GImage("heart_icon.jpeg")
             self.window.add(self.life_icons[i], self.window.width - ( self.life_icons[i].width * (3 - i)), self.window.height - self.life_icons[i].height - 12)
 
-
         # Default initial velocity and direction control for the ball.
         self.__dx = random.randint(MIN_X_SPEED, MAX_X_SPEED)
         if random.random() > 0.5:
@@ -96,6 +98,7 @@ class BreakoutGraphics:
 
         # Game flow control related
         self.ball_active = False
+        self.ball_destroy = False
         self.remained_life = self.num_lives
         self.remained_bricks = brick_cols * brick_rows
 
@@ -114,6 +117,9 @@ class BreakoutGraphics:
                 self.bricks[col * row] = GRect(brick_width, brick_height, x=col * (brick_spacing + brick_width) - brick_width, y=row * (brick_spacing + brick_height) - brick_height)
                 self.obj_fill_color_add(self.bricks[col * row], bricks_colors[row - 1])
                 self.bricks[col * row].color_str = bricks_colors[row - 1]
+        self.bricks_rows = brick_rows
+        self.bricks_spacing = brick_spacing
+        self.bricks_height = brick_height
 
         # Gave over label
         self.over_label = GLabel("Game Over")
@@ -122,43 +128,40 @@ class BreakoutGraphics:
 
         # create paddle cannon.
         self.cannon_base = GRect(CANNON_BASE_WIDTH, CANNON_BASE_HEIGHT, x=(window_width - CANNON_BASE_WIDTH) / 2, y=window_height - paddle_height - paddle_offset - CANNON_BASE_HEIGHT)
-        self.cannon_base.color = "black"
-        self.cannon_base.filled = True
-        self.cannon_base.fill_color = "black"
+        self.obj_fill_color_add(self.cannon_base, "black", False)
 
         self.cannon_tube = GRect(CANNON_TUBE_WIDTH, CANNON_TUBE_HEIGHT, x=(window_width - CANNON_TUBE_WIDTH) / 2, y=window_height - paddle_height - paddle_offset - CANNON_BASE_HEIGHT - CANNON_TUBE_HEIGHT)
-        self.cannon_tube.color = "black"
-        self.cannon_tube.filled = True
-        self.cannon_tube.fill_color = "black"
+        self.obj_fill_color_add(self.cannon_tube, "black", False)
 
-        # create cannon flame
+        # create cannon flame related instance variables
         self.outer_flame = GRect(OUTER_FLAME_WIDTH, self.cannon_tube.y, x=(window_width - OUTER_FLAME_WIDTH) / 2, y=0)
-        self.outer_flame.color = "red"
-        self.outer_flame.filled = True
-        self.outer_flame.fill_color = "red"
-        # self.obj_fill_color_add(self.outer_flame, "red")
+        self.obj_fill_color_add(self.outer_flame, "red", False)
         self.inner_flame_1 = GRect(INNER_FLAME1_WIDTH, self.cannon_tube.y, x=(window_width - INNER_FLAME1_WIDTH) / 2, y=0)
-        self.inner_flame_1.color = "yellow"
-        self.inner_flame_1.filled = True
-        self.inner_flame_1.fill_color = "yellow"
-        # self.obj_fill_color_add(self.inner_flame_1, "yellow")
+        self.obj_fill_color_add(self.inner_flame_1, "yellow", False)
         self.inner_flame_2 = GRect(INNER_FLAME2_WIDTH, self.cannon_tube.y, x=(window_width - INNER_FLAME2_WIDTH) / 2, y=0)
-        self.inner_flame_2.color = "lightyellow"
-        self.inner_flame_2.filled = True
-        self.inner_flame_2.fill_color = "lightyellow"
-        # self.obj_fill_color_add(self.inner_flame_2, "lightyellow")
+        self.obj_fill_color_add(self.inner_flame_2, "lightyellow", False)
+        self.flame_appear = False
 
-        # self.cannon_brick_index = random.randint(41, 50)
-        self.cannon_brick_index = 50
-
+        # create cannon related instance variables
         self.cannon_appear = False
         self.cannon_icon = GImage("cannon_icon.jpeg")
         self.cannon_icon_background = GRect(self.cannon_icon.width, self.cannon_icon.height)
-        self.cannon_icon_background.filled = True
-        self.cannon_icon_background.fill_color = "black"
+        self.obj_fill_color_add(self.cannon_icon, "black", False)
+        self.cannon_icon_dx = PROPERTY_ICON_X_SPEED
+        self.cannon_icon_dy = PROPERTY_ICON_Y_SPEED
+        self.trigger_cannon_bricks_num = random.randint(MIN_CANNON_BRICKS, MAX_CANNON_BRICKS)
 
-        self.cannon_icon_dx = CANNON_ICON_X_SPEED
-        self.cannon_icon_dy = CANNON_ICON_Y_SPEED
+        # create ball size increase related instance variables
+        self.ball_size_inc_appear = False
+        self.ball_size_inc_icon = GImage("ball_size_inc.jpeg")
+        self.ball_size_inc_icon_background = GRect(self.ball_size_inc_icon.width, self.ball_size_inc_icon.height)
+        self.obj_fill_color_add(self.ball_size_inc_icon, "black", False)
+        self.ball_size_inc_icon_dx = PROPERTY_ICON_X_SPEED
+        self.ball_size_inc_icon_dy = PROPERTY_ICON_Y_SPEED
+        self.ball_inc_appearance_interval = BALL_INCREASE_INTERVAL
+        self.trigger_ball_size_inc_bricks_num = random.randint(BRICK_ROWS * BRICK_COLS - self.ball_inc_appearance_interval, BRICK_ROWS * BRICK_COLS)
+        self.ball_increase = False
+        self.ball_radius_increase = BALL_RADIUS_INCREASE
 
     # getter for ball dx
     def get_ball_dx(self):
@@ -216,9 +219,9 @@ class BreakoutGraphics:
         self.ball.y = (self.window.height - self.ball.height) / 2
 
     # func helps fill and add object
-    def obj_fill_color_add(self, obj, color):
+    def obj_fill_color_add(self, obj, color, add = True):
         obj.color = color
         obj.filled = True
         obj.fill_color = color
-
-        self.window.add(obj)
+        if add:
+            self.window.add(obj)
