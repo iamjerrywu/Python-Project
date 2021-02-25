@@ -127,6 +127,7 @@ def main():
                     break
                 else:
                     graphics.reset_ball_position()
+                    graphics.init_ball_velocity()
             # if no bricks remaining, gave over
             if graphics.remained_bricks == 0:
                 break

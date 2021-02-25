@@ -53,17 +53,7 @@ class BreakoutGraphics:
         self.obj_fill_color_add(self.ball, "black")
 
         # Default initial velocity and direction control for the ball.
-        self.__dx = random.randint(MIN_X_SPEED, MAX_X_SPEED)
-        if random.random() > 0.5:
-            self.__dx = -self.__dx
-
-        if self.__dx > 0:
-            self.__dx_right = True
-        else:
-            self.__dx_right = False
-
-        self.__dy = INITIAL_Y_SPEED
-        self.__dy_down = True
+        self.init_ball_velocity()
 
         # Game flow control related
         self.ball_active = False
@@ -120,6 +110,19 @@ class BreakoutGraphics:
     def set_ball_dy_down(self, val):
         self.__dy_down = val
         return self.__dy_down
+
+    def init_ball_velocity(self):
+        self.__dx = random.randint(MIN_X_SPEED, MAX_X_SPEED)
+        if random.random() > 0.5:
+            self.__dx = -self.__dx
+
+        if self.__dx > 0:
+            self.__dx_right = True
+        else:
+            self.__dx_right = False
+
+        self.__dy = INITIAL_Y_SPEED
+        self.__dy_down = True
 
     # func for paddle track mouse.x position
     def move_paddle(self, mouse):
