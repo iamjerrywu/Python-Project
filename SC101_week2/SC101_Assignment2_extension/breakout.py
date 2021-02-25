@@ -167,7 +167,6 @@ def ball_collision_handler(obj):
     no_collide_list = [obj.score_label, obj.cannon_icon_background, obj.cannon_icon, obj.ball_size_inc_icon_background, obj.ball_size_inc_icon]
     for i in range(len(obj.life_icons)):
         no_collide_list.append(obj.life_icons[i])
-    print(len(obj.life_icons))
     if not obj.ball_destroy:
         # upper-left point:
         rm_obj = obj.window.get_object_at(obj.ball.x, obj.ball.y)
@@ -281,6 +280,13 @@ def change_dir_handler(obj, dx, dy):
         obj.set_ball_dy_down(False)
 
 
+def ball_acc_handler(obj, acc, stage):
+    acc_x = acc[0][stage] if obj.get_ball_dx_right() is True else -acc[0][stage]
+    obj.set_ball_dx(acc_x)
+    acc_y = acc[1][stage] if obj.get_ball_dy_down() is True else -acc[1][stage]
+    obj.set_ball_dy(acc_y)
+
+
 def game_over_handler(obj):
     obj.window.add(obj.over_label, (obj.window.width - obj.over_label.width) / 2, obj.window.height / 2)
     obj.window.remove(obj.paddle)
@@ -329,30 +335,20 @@ def main():
                     break
                 else:
                     graphics.reset_ball_position()
+                    graphics.init_ball_velocity()
             # if no bricks remaining, gave over
             if graphics.remained_bricks == 0:
                 break
+
             # ball accelerated when game goes on for a while
             if 45 < graphics.remained_bricks <= 47:
-                acc_x = acc[0][0] if graphics.get_ball_dx_right() is True else -acc[0][0]
-                graphics.set_ball_dx(acc_x)
-                acc_y = acc[1][0] if graphics.get_ball_dy_down() is True else -acc[1][0]
-                graphics.set_ball_dy(acc_y)
+                ball_acc_handler(graphics, acc, 0)
             if 40 < graphics.remained_bricks <= 42:
-                acc_x = acc[0][1] if graphics.get_ball_dx_right() is True else -acc[0][1]
-                graphics.set_ball_dx(acc_x)
-                acc_y = acc[1][1] if graphics.get_ball_dy_down() is True else -acc[1][1]
-                graphics.set_ball_dy(acc_y)
+                ball_acc_handler(graphics, acc, 1)
             if 35 < graphics.remained_bricks <= 37:
-                acc_x = acc[0][2] if graphics.get_ball_dx_right() is True else -acc[0][2]
-                graphics.set_ball_dx(acc_x)
-                acc_y = acc[1][2] if graphics.get_ball_dy_down() is True else -acc[1][2]
-                graphics.set_ball_dy(acc_y)
+                ball_acc_handler(graphics, acc, 2)
             if 30 < graphics.remained_bricks <= 32:
-                acc_x = acc[0][3] if graphics.get_ball_dx_right() is True else -acc[0][3]
-                graphics.set_ball_dx(acc_x)
-                acc_y = acc[1][3] if graphics.get_ball_dy_down() is True else -acc[1][3]
-                graphics.set_ball_dy(acc_y)
+                ball_acc_handler(graphics, acc, 3)
 
         pause(FRAME_RATE)
     game_over_handler(graphics)

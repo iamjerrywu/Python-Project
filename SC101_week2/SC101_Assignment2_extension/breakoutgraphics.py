@@ -24,7 +24,7 @@ BRICK_ROWS = 5             # Number of rows of bricks.
 BRICK_COLS = 10            # Number of columns of bricks.
 BRICK_OFFSET = 50          # Vertical offset of the topmost brick from the window top (in pixels).
 BALL_RADIUS = 20           # Radius of the ball (in pixels).
-PADDLE_WIDTH = 150         # Width of the paddle (in pixels).
+PADDLE_WIDTH = 200         # Width of the paddle (in pixels).
 PADDLE_HEIGHT = 15         # Height of the paddle (in pixels).
 PADDLE_OFFSET = 50         # Vertical offset of the paddle from the window bottom (in pixels).
 INITIAL_Y_SPEED = 4.0      # Initial vertical speed for the ball.
@@ -83,17 +83,7 @@ class BreakoutGraphics:
             self.window.add(self.life_icons[i], self.window.width - ( self.life_icons[i].width * (i + 1)), self.window.height - self.life_icons[i].height - 12)
 
         # Default initial velocity and direction control for the ball.
-        self.__dx = random.randint(MIN_X_SPEED, MAX_X_SPEED)
-        if random.random() > 0.5:
-            self.__dx = -self.__dx
-
-        if self.__dx > 0:
-            self.__dx_right = True
-        else:
-            self.__dx_right = False
-
-        self.__dy = INITIAL_Y_SPEED
-        self.__dy_down = True
+        self.init_ball_velocity()
 
         # Game flow control related
         self.ball_active = False
@@ -209,6 +199,19 @@ class BreakoutGraphics:
     def set_ball_dy_down(self, val):
         self.__dy_down = val
         return self.__dy_down
+
+    def init_ball_velocity(self):
+        self.__dx = random.randint(MIN_X_SPEED, MAX_X_SPEED)
+        if random.random() > 0.5:
+            self.__dx = -self.__dx
+
+        if self.__dx > 0:
+            self.__dx_right = True
+        else:
+            self.__dx_right = False
+
+        self.__dy = INITIAL_Y_SPEED
+        self.__dy_down = True
 
     # func for paddle track mouse.x position
     def move_paddle(self, mouse):
