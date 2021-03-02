@@ -12,6 +12,7 @@ TODO:
 
 import os
 import sys
+import math
 from simpleimage import SimpleImage
 
 
@@ -29,7 +30,8 @@ def get_pixel_dist(pixel, red, green, blue):
         dist (int): color distance between red, green, and blue pixel values
 
     """
-    pass
+    return math.sqrt((red - pixel.red)**2 + (green - pixel.green)**2 + (blue - pixel.blue)**2)
+
 
 
 def get_average(pixels):
@@ -75,6 +77,9 @@ def solve(images):
     result = SimpleImage.blank(width, height)
     ######## YOUR CODE STARTS HERE #########
     # Write code to populate image and create the 'ghost' effect
+    green_im = SimpleImage.blank(20, 20, 'green')
+    green_pixel = green_im.get_pixel(0, 0)
+    print(get_pixel_dist(green_pixel, 5, 255, 10))
 
     ######## YOUR CODE ENDS HERE ###########
     print("Displaying image!")
