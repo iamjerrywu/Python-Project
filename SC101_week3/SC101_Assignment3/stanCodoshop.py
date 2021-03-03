@@ -14,6 +14,7 @@ import os
 import sys
 import math
 from simpleimage import SimpleImage
+from simpleimage import Pixel
 
 
 def get_pixel_dist(pixel, red, green, blue):
@@ -46,7 +47,12 @@ def get_average(pixels):
     Assumes you are returning in the order: [red, green, blue]
 
     """
-    pass
+    sum = [0, 0, 0]
+    for pixel in pixels:
+        sum[0] += pixel.red
+        sum[1] += pixel.green
+        sum[2] += pixel.blue
+    return [sum_color//len(pixels) for sum_color in sum]
 
 
 def get_best_pixel(pixels):
@@ -60,8 +66,14 @@ def get_best_pixel(pixels):
         best (Pixel): pixel closest to RGB averages
 
     """
-    pass
-
+    avg = get_average(pixels)
+    min_dis = 255
+    min_pixel = Pixel(SimpleImage.blank(20, 20), 0, 0)
+    for pixel in pixels:
+        if min_dis > get_pixel_dist(pixel, avg[0], avg[1], avg[2]):
+            min_dis = get_pixel_dist(pixel, avg[0], avg[1], avg[2])
+            min_pixel = pixel
+    return min_pixel
 
 def solve(images):
     """
@@ -77,9 +89,23 @@ def solve(images):
     result = SimpleImage.blank(width, height)
     ######## YOUR CODE STARTS HERE #########
     # Write code to populate image and create the 'ghost' effect
-    green_im = SimpleImage.blank(20, 20, 'green')
-    green_pixel = green_im.get_pixel(0, 0)
-    print(get_pixel_dist(green_pixel, 5, 255, 10))
+    # milestone 1 verification
+    # green_im = SimpleImage.blank(20, 20, 'green')
+    # green_pixel = green_im.get_pixel(0, 0)
+    # print(get_pixel_dist(green_pixel, 5, 255, 10))
+
+    #milestone 2 verification
+    # green_pixel = SimpleImage.blank(20, 20, 'green').get_pixel(0, 0)
+    # red_pixel = SimpleImage.blank(20, 20, 'red').get_pixel(0, 0)
+    # blue_pixel = SimpleImage.blank(20, 20, 'blue').get_pixel(0, 0)
+    # print(get_average([green_pixel, green_pixel, green_pixel, blue_pixel]))
+
+    #milestone 3 verification
+    green_pixel = SimpleImage.blank(20, 20, 'green').get_pixel(0, 0)
+    red_pixel = SimpleImage.blank(20, 20, 'red').get_pixel(0, 0)
+    blue_pixel = SimpleImage.blank(20, 20, 'blue').get_pixel(0, 0)
+    best1 = get_best_pixel([green_pixel, blue_pixel, blue_pixel])
+    print(best1.red, best1.green, best1.blue)
 
     ######## YOUR CODE ENDS HERE ###########
     print("Displaying image!")
