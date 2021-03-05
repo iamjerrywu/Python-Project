@@ -1,0 +1,16 @@
+Jerry 26 liao1226@stanford.edu Fries Cola Burger
+Tom 26 tom1234@gmail.com Beef_noodle Pork_belly
+Jessica 21 jessica62@gmail.com Pancakes Milk_tea coffee
+Ben 23 benlin@yahoo.com.tw Fried_rice Dumplings
+Kelly 18 kellyf1@gmail.com Chicken_salad
+Candy 16 candycrush@yahoo.com.tw Burrito
+Isaac 12 isaac1028@gmail.clm Spaghetti Meatball
+Nicole 25 nicchen@gmail.com Bubble_tea Ice_cream Cheese_cake
+Eric 27 ericchen@gmail.com Hawaiian_pizza
+Alice 19 alicewu@yahoo.com.tw Cookies Chocolate Candy
+Orry 29 orry321@gmail.com Lasagna
+Ginny 14 ginny333@gmail.com Sundae
+Robert 24 robertchen@yahoo.com.tw Sushi Nigiri Sashimi Miso_soup
+Anna 25 annachiao@yahoo.com.tw Korean_BBQ Kimchi
+Hubert 27 hubertlu@yahoo.com.tw Omelet Bacon Coffee
+Nina 26 nina34@gmail.com Gong_bao_chicken Rice Broccoli
