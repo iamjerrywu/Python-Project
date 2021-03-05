@@ -1,5 +1,6 @@
 """
 File: stanCodoshop.py
+Name: Sheng-Hao Wu
 ----------------------------------------------
 SC101_Assignment3
 Adapted from Nick Parlante's
@@ -7,7 +8,6 @@ Ghost assignment by Jerry Liao.
 
 -----------------------------------------------
 
-TODO:
 """
 
 import os
@@ -31,8 +31,8 @@ def get_pixel_dist(pixel, red, green, blue):
         dist (int): color distance between red, green, and blue pixel values
 
     """
+    # square root function to calculate RGB's color distance
     return math.sqrt((red - pixel.red)**2 + (green - pixel.green)**2 + (blue - pixel.blue)**2)
-
 
 
 def get_average(pixels):
@@ -47,12 +47,14 @@ def get_average(pixels):
     Assumes you are returning in the order: [red, green, blue]
 
     """
-    sum = [0, 0, 0]
+    pixel_sum = [0, 0, 0]
     for pixel in pixels:
-        sum[0] += pixel.red
-        sum[1] += pixel.green
-        sum[2] += pixel.blue
-    return [sum_color//len(pixels) for sum_color in sum]
+        # accumulate pixel R/G/B' value sum
+        pixel_sum[0] += pixel.red
+        pixel_sum[1] += pixel.green
+        pixel_sum[2] += pixel.blue
+    # return the average of R/G/B value
+    return [color_sum//len(pixels) for color_sum in pixel_sum]
 
 
 def get_best_pixel(pixels):
@@ -66,14 +68,21 @@ def get_best_pixel(pixels):
         best (Pixel): pixel closest to RGB averages
 
     """
+    # get RGB average values
     avg = get_average(pixels)
-    min_dis = 255
+    # init minimum color distance (largest as 255)
+    min_dist = 255
+    # init minimum pixel
     min_pixel = Pixel(SimpleImage.blank(20, 20), 0, 0)
+
+    # traverse pixels
     for pixel in pixels:
-        if min_dis > get_pixel_dist(pixel, avg[0], avg[1], avg[2]):
-            min_dis = get_pixel_dist(pixel, avg[0], avg[1], avg[2])
+        # comparison for the pixel that has minimum color distance
+        if min_dist > get_pixel_dist(pixel, avg[0], avg[1], avg[2]):
+            min_dist = get_pixel_dist(pixel, avg[0], avg[1], avg[2])
             min_pixel = pixel
     return min_pixel
+
 
 def solve(images):
     """
@@ -84,30 +93,24 @@ def solve(images):
     Input:
         images (List[SimpleImage]): list of images to be processed
     """
+    # since every image in a series are in the same size
+    # init image width/height with the first image
     width = images[0].width
     height = images[0].height
     result = SimpleImage.blank(width, height)
-    ######## YOUR CODE STARTS HERE #########
-    # Write code to populate image and create the 'ghost' effect
-    # milestone 1 verification
-    # green_im = SimpleImage.blank(20, 20, 'green')
-    # green_pixel = green_im.get_pixel(0, 0)
-    # print(get_pixel_dist(green_pixel, 5, 255, 10))
 
-    #milestone 2 verification
-    # green_pixel = SimpleImage.blank(20, 20, 'green').get_pixel(0, 0)
-    # red_pixel = SimpleImage.blank(20, 20, 'red').get_pixel(0, 0)
-    # blue_pixel = SimpleImage.blank(20, 20, 'blue').get_pixel(0, 0)
-    # print(get_average([green_pixel, green_pixel, green_pixel, blue_pixel]))
-
-    #milestone 3 verification
-    green_pixel = SimpleImage.blank(20, 20, 'green').get_pixel(0, 0)
-    red_pixel = SimpleImage.blank(20, 20, 'red').get_pixel(0, 0)
-    blue_pixel = SimpleImage.blank(20, 20, 'blue').get_pixel(0, 0)
-    best1 = get_best_pixel([green_pixel, blue_pixel, blue_pixel])
-    print(best1.red, best1.green, best1.blue)
-
-    ######## YOUR CODE ENDS HERE ###########
+    # traverse all the image point from x:width to y:height
+    for x in range(width):
+        for y in range(height):
+            # list to store those images' pixel in (x,y)
+            img_pixel_list = []
+            for img in images:
+                # append each image pixel at (x,y) into empty list
+                img_pixel_list.append(img.get_pixel(x, y))
+            # calculate (x,y) best pixel (with minimum color distance)
+            best_pixel = get_best_pixel(img_pixel_list)
+            # set best pixel on result's (x,y) position
+            result.set_pixel(x, y, best_pixel)
     print("Displaying image!")
     result.show()
 
