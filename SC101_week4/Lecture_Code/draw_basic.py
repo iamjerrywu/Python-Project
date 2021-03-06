@@ -5,7 +5,6 @@ Stanford CS106AP
 TK Drawing Lecture Exercises
 Courtesy of Nick Parlante
 """
-
 import tkinter as tk
 
 
@@ -27,7 +26,16 @@ def make_canvas(width, height):
 
 
 def main():
-    pass
+    w = make_canvas(500, 300)
+    # draw line
+    # w.create_line(x1, y1, x2, y2, width = X, fill = "X"
+    w.create_line(0, 200, 200, 200, width = 10, fill = "blue")
+    #create text
+    w.create_text(0, 0, text = "Hello World!", anchor = tk.NW, fill = "red", font = 'times, 40')
+    # anchor can change the text
+    #tk.NW / tk.NE / tk.SW / tk.SE
+    tk.mainloop()
+
     
 
 if __name__ == '__main__':
