@@ -15,7 +15,15 @@ def main():
 
 
 def factorial(n):
-	pass
+	if n == 0:
+		return 1
+	# for i in range(n):
+	# 	print(i)
+	#
+	ans = 1
+	for i in range(1, n+1):
+		ans*= i
+	return ans
 
 
 if __name__ == '__main__':
