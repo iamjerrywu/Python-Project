@@ -50,17 +50,21 @@ def add_file(name_data, filename):
         the provided file name. This function does not return any value.
 
     """
+    # 1st line is year and only
     with open(filename, 'r') as f:
-        for name_data_line in f:
+        year = f.readlines()[0].strip()
+    # after 1st line, each line contains rank, name1, name2
+    with open(filename, 'r') as f:
+        name_data_lines = f.readlines()[1:]
+        # traverse each line
+        for name_data_line in name_data_lines:
+            # delimiters ',' to separate line into three components
             name_data_list = name_data_line.split(',')
-
             rank = name_data_list[0].strip()
             name1 = name_data_list[1].strip()
             name2 = name_data_list[2].strip()
-            add_data_for_name(name_data, )
-
-
-
+            add_data_for_name(name_data, year, rank, name1)
+            add_data_for_name(name_data, year, rank, name2)
 
 def read_files(filenames):
     """
@@ -73,7 +77,10 @@ def read_files(filenames):
     Returns:
         name_data (dict): the dict storing all baby name data in a structured manner
     """
-    pass
+    name_data = {}
+    for filename in filenames:
+        add_file(name_data, filename)
+    return name_data
 
 
 def search_names(name_data, target):
@@ -91,7 +98,13 @@ def search_names(name_data, target):
                                     the target string
 
     """
-    pass
+    res = []
+    for name in name_data:
+        # find if target in name_data (case-insensitive)
+        if target.lower() in name.lower():
+            res.append(name)
+    return res
+
 
 
 def print_names(name_data):

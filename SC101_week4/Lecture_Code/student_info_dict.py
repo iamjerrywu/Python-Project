@@ -16,7 +16,12 @@ def main():
 	all_d = {}
 	######################
 	with open(FILE, 'r') as f:
-		for line in f:
+		data = f.readlines()[0]
+		print(data)
+	with open(FILE, 'r') as f:
+		lines = f.readlines()[1:]
+		print(lines)
+		for line in lines:
 			info_list = line.split()
 			name = info_list[0]
 			age = info_list[1]
