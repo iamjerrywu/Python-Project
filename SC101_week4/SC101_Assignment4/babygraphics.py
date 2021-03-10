@@ -9,6 +9,7 @@ YOUR DESCRIPTION HERE
 import tkinter
 import babynames
 import babygraphicsgui as gui
+import tkinter as tk
 
 FILENAMES = [
     'data/full/baby-1900.txt', 'data/full/baby-1910.txt',
@@ -41,7 +42,7 @@ def get_x_coordinate(width, year_index):
         x_coordinate (int): The x coordinate of the vertical line associated
                               with the specified year.
     """
-    pass
+    return ((width - 2 * GRAPH_MARGIN_SIZE) / len(YEARS)) * year_index + GRAPH_MARGIN_SIZE
 
 
 def draw_fixed_lines(canvas):
@@ -57,8 +58,15 @@ def draw_fixed_lines(canvas):
     """
     canvas.delete('all')            # delete all existing lines from the canvas
 
-    # Write your code below this line
-    #################################
+    # construct horizontal lines
+    canvas.create_line(GRAPH_MARGIN_SIZE, GRAPH_MARGIN_SIZE, CANVAS_WIDTH - GRAPH_MARGIN_SIZE, GRAPH_MARGIN_SIZE, width = LINE_WIDTH, fill = "black")
+    canvas.create_line(GRAPH_MARGIN_SIZE, CANVAS_HEIGHT - GRAPH_MARGIN_SIZE, CANVAS_WIDTH - GRAPH_MARGIN_SIZE, CANVAS_HEIGHT - GRAPH_MARGIN_SIZE, width = LINE_WIDTH, fill = "black")
+    # construct straight lines
+
+    for index in range(len(YEARS)):
+        canvas.create_line(get_x_coordinate(CANVAS_WIDTH, index), 0, get_x_coordinate(CANVAS_WIDTH, index), CANVAS_HEIGHT, width = LINE_WIDTH, fill = 'black')
+        canvas.create_text(get_x_coordinate(CANVAS_WIDTH, index) + TEXT_DX, CANVAS_HEIGHT, text = str(YEARS[index]), anchor = tk.SW, fill = 'black')
+
 
 
 def draw_names(canvas, name_data, lookup_names):
@@ -77,7 +85,7 @@ def draw_names(canvas, name_data, lookup_names):
     draw_fixed_lines(canvas)        # draw the fixed background grid
 
     # Write your code below this line
-    #################################
+
 
 
 # main() code is provided, feel free to read through it but DO NOT MODIFY
