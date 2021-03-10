@@ -84,8 +84,24 @@ def draw_names(canvas, name_data, lookup_names):
     """
     draw_fixed_lines(canvas)        # draw the fixed background grid
 
-    # Write your code below this line
-
+    color_id = 0
+    for name in lookup_names:
+        color_id%=len(COLORS)
+        pos_list = []
+        for yr_id in range(len(YEARS)):
+            year_pos = []
+            year_pos.append(get_x_coordinate(CANVAS_WIDTH, yr_id))
+            if str(YEARS[yr_id]) in name_data[name]:
+                year_pos.append(int(name_data[name][str(YEARS[yr_id])]) * CANVAS_HEIGHT // MAX_RANK + GRAPH_MARGIN_SIZE)
+            else:
+                year_pos.append(CANVAS_HEIGHT - GRAPH_MARGIN_SIZE)
+            print(year_pos)
+            pos_list.append(year_pos)
+            rank = str(name_data[name].get(str(YEARS[yr_id]))) if str(YEARS[yr_id]) in name_data[name] else "*"
+            canvas.create_text(year_pos[0] + TEXT_DX, year_pos[1], text = str(name) +" " + rank, anchor = tk.SW, fill = COLORS[color_id])
+        for i in range(len(YEARS) - 1):
+            canvas.create_line(pos_list[i][0], pos_list[i][1], pos_list[i + 1][0], pos_list[i + 1][1], width = LINE_WIDTH, fill = COLORS[color_id])
+        color_id+=1
 
 
 # main() code is provided, feel free to read through it but DO NOT MODIFY
