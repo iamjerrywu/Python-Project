@@ -3,7 +3,12 @@ SC101 Baby Names Project
 Adapted from Nick Parlante's Baby Names assignment by
 Jerry Liao.
 
-YOUR DESCRIPTION HERE
+Author:
+sheng-hao wu
+
+File:
+source code of implementing graphics design and results
+
 """
 
 import tkinter
@@ -58,11 +63,11 @@ def draw_fixed_lines(canvas):
     """
     canvas.delete('all')            # delete all existing lines from the canvas
 
-    # construct horizontal lines
+    # construct horizontal lines on canvas
     canvas.create_line(GRAPH_MARGIN_SIZE, GRAPH_MARGIN_SIZE, CANVAS_WIDTH - GRAPH_MARGIN_SIZE, GRAPH_MARGIN_SIZE, width = LINE_WIDTH, fill = "black")
     canvas.create_line(GRAPH_MARGIN_SIZE, CANVAS_HEIGHT - GRAPH_MARGIN_SIZE, CANVAS_WIDTH - GRAPH_MARGIN_SIZE, CANVAS_HEIGHT - GRAPH_MARGIN_SIZE, width = LINE_WIDTH, fill = "black")
-    # construct straight lines
 
+    # construct straight lines and year  text labels on canvas
     for index in range(len(YEARS)):
         canvas.create_line(get_x_coordinate(CANVAS_WIDTH, index), 0, get_x_coordinate(CANVAS_WIDTH, index), CANVAS_HEIGHT, width = LINE_WIDTH, fill = 'black')
         canvas.create_text(get_x_coordinate(CANVAS_WIDTH, index) + TEXT_DX, CANVAS_HEIGHT, text = str(YEARS[index]), anchor = tk.SW, fill = 'black')
@@ -85,22 +90,35 @@ def draw_names(canvas, name_data, lookup_names):
     draw_fixed_lines(canvas)        # draw the fixed background grid
 
     color_id = 0
+    # traverse total searched names
     for name in lookup_names:
-        color_id%=len(COLORS)
+        # wrap color_id in four
+        color_id%= len(COLORS)
+        # total position list to store all (12) ranking positions from each year
         pos_list = []
         for yr_id in range(len(YEARS)):
+            # yearly position [x, y]
             year_pos = []
+            # get x position
             year_pos.append(get_x_coordinate(CANVAS_WIDTH, yr_id))
+            # get y position by searching based on year from name_data
+            # if rank existed, transfer to valid y position
+            # y position: start point + (rank * valid canvas height // max range)
             if str(YEARS[yr_id]) in name_data[name]:
-                year_pos.append(int(name_data[name][str(YEARS[yr_id])]) * CANVAS_HEIGHT // MAX_RANK + GRAPH_MARGIN_SIZE)
+                year_pos.append(int(name_data[name][str(YEARS[yr_id])]) * (CANVAS_HEIGHT - 2 * GRAPH_MARGIN_SIZE) // MAX_RANK + GRAPH_MARGIN_SIZE)
             else:
                 year_pos.append(CANVAS_HEIGHT - GRAPH_MARGIN_SIZE)
-            print(year_pos)
+            # add yearly position into total position list
             pos_list.append(year_pos)
+            # get rank in string format
             rank = str(name_data[name].get(str(YEARS[yr_id]))) if str(YEARS[yr_id]) in name_data[name] else "*"
-            canvas.create_text(year_pos[0] + TEXT_DX, year_pos[1], text = str(name) +" " + rank, anchor = tk.SW, fill = COLORS[color_id])
+            # create text
+            canvas.create_text(year_pos[0] + TEXT_DX, year_pos[1], text = str(name) + " " + rank, anchor = tk.SW, fill = COLORS[color_id])
+        # line amount would be (points number  - 1)
         for i in range(len(YEARS) - 1):
+            # create lines between every year's position
             canvas.create_line(pos_list[i][0], pos_list[i][1], pos_list[i + 1][0], pos_list[i + 1][1], width = LINE_WIDTH, fill = COLORS[color_id])
+        # switch to next color
         color_id+=1
 
 

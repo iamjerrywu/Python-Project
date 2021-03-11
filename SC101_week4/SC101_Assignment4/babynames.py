@@ -3,7 +3,11 @@ SC101 Baby Names Project
 Adapted from Nick Parlante's Baby Names assignment by
 Jerry Liao.
 
-YOUR DESCRIPTION HERE
+Author:
+sheng-hao wu
+
+File:
+source code of data processing based on yearly (1900~2010) baby's name ranking profile
 """
 
 import sys
@@ -77,6 +81,7 @@ def read_files(filenames):
     Returns:
         name_data (dict): the dict storing all baby name data in a structured manner
     """
+    # init empty name_data dictionary
     name_data = {}
     for filename in filenames:
         add_file(name_data, filename)
