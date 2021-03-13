@@ -26,7 +26,40 @@ def main():
 
 
 def draw_rect(level, width, center_x, center_y):
-	pass
+	if level == 0:
+		pass
+	else:
+		# rect = GRect(width, width, x = center_x - width/2, y = center_y - width/2)
+		# rect.filled = True
+		# rect.color = 'black'
+		# rect.fill_color = 'snow'
+		# window.add(rect)
+		#
+		# # upper left
+		# draw_rect(level - 1, width/2, center_x - width/2, center_y - width/2)
+		# # upper right
+		# draw_rect(level - 1, width / 2, center_x + width / 2, center_y - width / 2)
+		# # down left
+		# draw_rect(level - 1, width / 2, center_x - width / 2, center_y + width / 2)
+		# # down right
+		# draw_rect(level - 1, width / 2, center_x + width / 2, center_y + width / 2)
+
+		rect = GRect(width, width, x=center_x - width / 2, y=center_y - width / 2)
+		rect.filled = True
+		rect.color = 'black'
+		rect.fill_color = 'snow'
+
+		# upper left
+		draw_rect(level - 1, width / 2, center_x - width / 2, center_y - width / 2)
+		# down right
+		draw_rect(level - 1, width / 2, center_x + width / 2, center_y + width / 2)
+
+		window.add(rect)
+		# upper right
+		draw_rect(level - 1, width / 2, center_x + width / 2, center_y - width / 2)
+		# down left
+		draw_rect(level - 1, width / 2, center_x - width / 2, center_y + width / 2)
+
 
 
 if __name__ == '__main__':

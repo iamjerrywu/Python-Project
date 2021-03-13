@@ -12,9 +12,19 @@ recursion problems.
 def main():
 	binary_permutations(3)
 
+def helper(n, res):
+	if n == len(res):
+		print(res)
+	else:
+		helper(n, res + '0')
+		helper(n, res + '1')
 
 def binary_permutations(n):
-	pass
+	i = 0
+	helper(n, "")
+
+
+
 
 
 if __name__ == '__main__':

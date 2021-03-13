@@ -12,8 +12,24 @@ def main():
 	permutation([1, 2, 3])
 
 
+def helper(i, visited, lst, res):
+	if len(res) == len(lst):
+		print(res)
+	else:
+		for i in range(len(lst)):
+			# if not visited[i]:
+			if lst[i] not in res:
+				# visited[i] = True
+
+				res.append(lst[i])
+				helper(i, visited, lst, res)
+				res.pop()
+				# visited[i] = False
+
 def permutation(lst):
-	pass
+	res = []
+	visited = [False] * len(lst)
+	helper(0, visited, lst, res)
 
 
 
