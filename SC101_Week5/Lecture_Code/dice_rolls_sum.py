@@ -22,7 +22,7 @@ def helper(target_sum, current, cnt_list):
         print(current)
         print(cnt_list[0])
     else:
-        print(current)
+        # print(current)
         for roll in range(1, 7):
             if roll > cnt_list[1]:
                 cnt_list[1] = float('inf')
