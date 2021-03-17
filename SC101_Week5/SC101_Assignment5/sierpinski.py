@@ -8,8 +8,9 @@ It is a self similar structure that occurs at different levels of iterations.
 """
 
 from campy.graphics.gwindow import GWindow
-from campy.graphics.gobjects import GLine
+from campy.graphics.gobjects import GLine, GRect
 from campy.gui.events.timer import pause
+import math
 
 # Constants
 ORDER = 6                  # Controls the order of Sierpinski Triangle
@@ -38,7 +39,26 @@ def sierpinski_triangle(order, length, upper_left_x, upper_left_y):
 	:param upper_left_y:
 	:return:
 	"""
-	pass
+	# break condition for recursion
+	if order == 0:
+		return
+	# draw triangle left edge
+	line_1 = GLine(upper_left_x, upper_left_y, upper_left_x + length, upper_left_y)
+	window.add(line_1)
+	# draw triangle right edge
+	line_2 = GLine(upper_left_x, upper_left_y, upper_left_x + length/2, upper_left_y + length * math.sqrt(3)/2)
+	window.add(line_2)
+	# draw triangle bottom edge
+	line_3 = GLine(upper_left_x + length, upper_left_y, upper_left_x + length/2, upper_left_y + length * math.sqrt(3)/2)
+	window.add(line_3)
+
+	# recursively draw the three smaller triangle
+	# upper left triangle
+	sierpinski_triangle(order - 1, length/2, upper_left_x, upper_left_y)
+	# upper right triangle
+	sierpinski_triangle(order - 1, length/2, upper_left_x + length/2, upper_left_y)
+	# bottom triangle
+	sierpinski_triangle(order - 1, length/2, upper_left_x + length/4, upper_left_y + length/2 * math.sqrt(3)/2)
 
 
 if __name__ == '__main__':
